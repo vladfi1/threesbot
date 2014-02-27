@@ -10,3 +10,7 @@ How to Run
 2. Open the developer console (ctrl+shift+k in firefox).
 3. Paste and run app.js into the console. A "play" button should appear.
 4. Press play!
+
+Developer Note: app.js is auto-generated from the other js files. To generate it, run:
+
+    ./makeApp.sh
