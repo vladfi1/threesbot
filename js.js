@@ -1,7 +1,3 @@
-function myFunction() {
-  alert("HellO");
-}
-
 var canPushArrayIndex = function(array, i) {
   if (array[i] == null) {
     if (array[i-1] != null) return true;
