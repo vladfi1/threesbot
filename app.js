@@ -232,20 +232,26 @@ var Controller = function() {
     return move;
   };
 
+  that.redrawBoard = function() {
+    // directly render; who needs animations
+    // looks horrible though :(
+    $(".board>.tile").remove();
+    document.THREE.display.render_board();
+  };
+
   that.move = function() {
     moveCounter++;
 
-    //if(moveCounter % 10 === 0) {
-        $(".board>.tile").remove();
-        document.THREE.display.render_board();
-    //}
-
+    that.redrawBoard();
 
     var gameState = readGameState();
     var nextMove = moveEvaluator.evaluateMove(searchDepth, gameState.board, gameState.nextTile);
     var canMove = moveEvaluator.canApplyMove(gameState.board, nextMove[0]);
-    console.log(nextMove + " : canApplyMove = " + canMove);
+    // console.log(nextMove + " : canApplyMove = " + canMove);
+
+    // in order to check we can't move in any direction
     var canMoveDirs = 4;
+
     if(canMove === false) {
       console.log(stringifyBoard(gameState.board));
       for(var i=0; i<4; i++) {
@@ -255,6 +261,8 @@ var Controller = function() {
         }
         console.log(moveEvaluator.dirs[i] + " : " + canMoveThisDir);
       }
+
+      // if no moves, stop (should be game over)
       if(canMoveDirs === 0) {
         that.stop();
       }
@@ -270,6 +278,8 @@ var Controller = function() {
   };
 
   that.stop = function() {
+    that.redrawBoard();
+
     $("#playButton").attr("value", "Play").click(controller.play);
     if(playInterval !== null) {
       clearInterval(playInterval);
