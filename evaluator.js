@@ -16,16 +16,13 @@ var MoveEvaluator = function() {
   };
 
   var canPushArrayIndex = function(array, i) {
-    if (array[i] === 0) {
-      if (array[i-1] !== 0) return true;
-    } else if (array[i] === 1) {
-      if (array[i-1] === 2) return true;
-    } else if (array[i] === 2) {
-      if (array[i-1] === 1) return true;
-    } else {
-      if (array[i-1] === array[i]) return true;
+    switch (array[i]) {
+    case null: return false;
+    case 0: return array[i-1] !== 0;
+    case 1: return array[i-1] === 2;
+    case 2: return array[i-1] === 1;
+    default: return array[i-1] === array[i];
     }
-    return false;
   }
 
   var canPushArray = function(array) {
@@ -144,7 +141,7 @@ var MoveEvaluator = function() {
     
     for (var i = free.length; --i >= 0;) {
       grid[free[i]][0] = next;
-      avg += evaluate(depth, grid);
+      avg += evaluate(depth, grid, false);
       grid[free[i]][0] = 0;
     }
     
@@ -169,11 +166,13 @@ var MoveEvaluator = function() {
 
   var tiles = [1, 2, 3];
 
-  // averages over possible next tiles
-  var evaluate = function(depth, grid) {
+  // averages over possible next tiles, unless fast = true
+  var evaluate = function(depth, grid, fast) {
     if (depth === 0) return heuristic(grid);
     
-    var scores = tiles.map(function(tile) {
+    var next = fast ? [null] : tiles;
+    
+    var scores = next.map(function(tile) {
       return that.evaluateMove(depth - 1, grid, tile)[1];
     });
     
@@ -184,6 +183,6 @@ var MoveEvaluator = function() {
     avg /= scores.length;
     return avg;
   };
-
+  
   return that;
 };
