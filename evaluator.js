@@ -17,14 +17,14 @@ var argmax = function(array) {
 };
 
 var canPushArrayIndex = function(array, i) {
-  if (array[i] == null) {
-    if (array[i-1] != null) return true;
-  } else if (array[i] == 1) {
-    if (array[i-1] == 2) return true;
-  } else if (array[i] == 2) {
-    if (array[i-1] == 1) return true;
+  if (array[i] === null) {
+    if (array[i-1] !== null) return true;
+  } else if (array[i] === 1) {
+    if (array[i-1] === 2) return true;
+  } else if (array[i] === 2) {
+    if (array[i-1] === 1) return true;
   } else {
-    if (array[i-1] == array[i]) return true;
+    if (array[i-1] === array[i]) return true;
   }
   return false;
 }
@@ -48,7 +48,7 @@ var pushArray = function(array) {
     }
   }
   
-  if (index == 0) return false;
+  if (index === 0) return false;
   
   while (--index > 0) {
     array[index] = array[index-1];
@@ -127,7 +127,7 @@ var heuristic = function(grid) {
   var empty = 0;
   for (var row = grid.length; --row >= 0;) {
     for (var col = grid[row].length; --col >= 0;) {
-      if (grid[row][col] == null) ++empty;
+      if (grid[row][col] === null) ++empty;
     }
   }
   return empty;
@@ -138,7 +138,7 @@ var evaluatePartial = function(depth, partialGrid, next) {
   var grid = partialGrid[0];
   var free = partialGrid[1];
   
-  if (free.length == 0) return 0;
+  if (free.length === 0) return 0;
   
   var avg = 0;
   
@@ -169,7 +169,7 @@ var tiles = [1, 2, 3];
 
 // averages over possible next tiles
 var evaluate = function(depth, grid) {
-  if (depth == 0) return heuristic(grid);
+  if (depth === 0) return heuristic(grid);
   
   var scores = tiles.map(function(tile) {
     return evaluateMove(depth - 1, grid, tile)[1];
