@@ -16,11 +16,14 @@ var Controller = function() {
   var moveEvaluator = MoveEvaluator();
   var playInterval = null; // for setInterval purposes
 
+  // move counter
+  var moveCounter = 0;
+
   // move delay, in ms
-  var moveDelay = 1000;
+  var moveDelay = 200;
 
   // search depth
-  var searchDepth = 1;
+  var searchDepth = 2;
 
   // whether to cheat and use the list of next tiles
   // not yet implemented
@@ -40,15 +43,39 @@ var Controller = function() {
     return move;
   };
 
+  that.redrawBoard = function() {
+    // directly render; who needs animations
+    // looks horrible though :(
+    $(".board>.tile").remove();
+    document.THREE.display.render_board();
+  };
+
   that.move = function() {
+    moveCounter++;
+
+    that.redrawBoard();
+
     var gameState = readGameState();
     var nextMove = moveEvaluator.evaluateMove(searchDepth, gameState.board, gameState.nextTile);
     var canMove = moveEvaluator.canApplyMove(gameState.board, nextMove[0]);
-    console.log(nextMove + " : canApplyMove = " + canMove);
+    // console.log(nextMove + " : canApplyMove = " + canMove);
+
+    // in order to check we can't move in any direction
+    var canMoveDirs = 4;
+
     if(canMove === false) {
       console.log(stringifyBoard(gameState.board));
       for(var i=0; i<4; i++) {
-        console.log(moveEvaluator.dirs[i] + " : " + moveEvaluator.canApplyMove(gameState.board, moveEvaluator.dirs[i]));
+        var canMoveThisDir = moveEvaluator.canApplyMove(gameState.board, moveEvaluator.dirs[i]);
+        if(canMoveThisDir === false) {
+          canMoveDirs--;
+        }
+        console.log(moveEvaluator.dirs[i] + " : " + canMoveThisDir);
+      }
+
+      // if no moves, stop (should be game over)
+      if(canMoveDirs === 0) {
+        that.stop();
       }
     }
     return inputMove(nextMove[0]);
@@ -62,6 +89,8 @@ var Controller = function() {
   };
 
   that.stop = function() {
+    that.redrawBoard();
+
     $("#playButton").attr("value", "Play").click(controller.play);
     if(playInterval !== null) {
       clearInterval(playInterval);
