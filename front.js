@@ -20,7 +20,7 @@ var Controller = function() {
   var moveDelay = 1000;
 
   // search depth
-  var searchDepth = 0;
+  var searchDepth = 1;
 
   // whether to cheat and use the list of next tiles
   // not yet implemented
