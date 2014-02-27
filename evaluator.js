@@ -159,7 +159,7 @@ var MoveEvaluator = function() {
     // console.log('evaluateMove: depth = ' + depth);
     
     var scores = partialGrids.map(function(partialGrid) {
-      return evaluatePartial(depth, partialGrid, next);
+      return 1 + evaluatePartial(depth, partialGrid, next);
     });
     
     var maxIndex = argmax(scores);
@@ -184,7 +184,6 @@ var MoveEvaluator = function() {
     avg /= scores.length;
     return avg;
   };
-
 
   return that;
 };
