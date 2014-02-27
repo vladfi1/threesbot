@@ -157,7 +157,7 @@ var evaluateMove = function(depth, grid, next) {
   var partialGrids = partialApplyMoves(grid);
   
   var scores = partialGrids.map(function(partialGrid) {
-    return evaluatePartial(depth, partialGrid, next);
+    return 1 + evaluatePartial(depth, partialGrid, next);
   });
   
   var maxIndex = argmax(scores);
