@@ -242,11 +242,9 @@ var Controller = function() {
   that.move = function() {
     moveCounter++;
 
-    that.redrawBoard();
-
     var gameState = readGameState();
-    var nextMove = moveEvaluator.evaluateMove(searchDepth, gameState.board, gameState.nextTile);
-    var canMove = moveEvaluator.canApplyMove(gameState.board, nextMove[0]);
+    var nextMove = moveEvaluator.evaluateMove(searchDepth, gameState.board, gameState.nextTile)[0];
+    var canMove = moveEvaluator.canApplyMove(gameState.board, nextMove);
     // console.log(nextMove + " : canApplyMove = " + canMove);
 
     // in order to check we can't move in any direction
@@ -267,7 +265,11 @@ var Controller = function() {
         that.stop();
       }
     }
-    return inputMove(nextMove[0]);
+
+    inputMove(nextMove);
+    that.redrawBoard();
+
+    return nextMove;
   };
 
   that.play = function() {
