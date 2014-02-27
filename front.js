@@ -22,7 +22,7 @@ var readGameState = function() {
   for(var i=0; i<$tiles.length; i++) {
     var $tile = $($tiles[i]);
     var coords = $tile.attr("data-coords");
-    ret[coords.charAt(0)][coords.charAt(1)] = parseInt($tile.html());
+    state[coords.charAt(0)][coords.charAt(1)] = parseInt($tile.html());
   }
 
   state.board = board;
