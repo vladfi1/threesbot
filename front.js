@@ -26,7 +26,7 @@ var Controller = function() {
   var choppy = false;
 
   // search depth
-  var searchDepth = 2;
+  var searchDepth = 3;
 
   // whether to cheat and use the list of next tiles
   // not yet implemented

@@ -136,7 +136,7 @@ var MoveEvaluator = function() {
     return dirs.map(function(dir) { return partialApplyMove(grid, dir); });
   };
 
-  var heuristic = function(grid) {
+  var emptySquares = function(grid) {
     var empty = 0;
     for (var row = grid.length; --row >= 0;) {
       for (var col = grid[row].length; --col >= 0;) {
@@ -145,7 +145,27 @@ var MoveEvaluator = function() {
     }
     return empty;
   };
-
+  
+  var scoreTile = function(tile) {
+    if (tile === null || tile === 1 || tile === 2) return 0;
+    var score = 1;
+    while (tile > 3) {
+      tile /= 2;
+      score *= 3;
+    }
+    return score;
+  };
+  
+  var scoreBoard = function(grid) {
+    var score = 0;
+    for (var row = grid.length; --row >= 0;) {
+      for (var col = grid[row].length; --col >= 0;) {
+        score += scoreTile(grid[row][col]);
+      }
+    }
+    return score;
+  };
+  
   // averages over where the next tile goes
   var evaluatePartial = function(depth, partialGrid, next) {
     var grid = partialGrid[0];
@@ -157,7 +177,7 @@ var MoveEvaluator = function() {
     
     for (var i = free.length; --i >= 0;) {
       grid[free[i]][0] = next;
-      avg += evaluate(depth, grid, false);
+      avg += evaluate(depth, grid, true);
       grid[free[i]][0] = 0;
     }
     
@@ -184,7 +204,7 @@ var MoveEvaluator = function() {
 
   // averages over possible next tiles, unless fast = true
   var evaluate = function(depth, grid, fast) {
-    if (depth === 0) return heuristic(grid);
+    if (depth === 0) return scoreBoard(grid);
     
     var next = fast ? [null] : tiles;
     
@@ -230,7 +250,7 @@ var Controller = function() {
   var choppy = false;
 
   // search depth
-  var searchDepth = 2;
+  var searchDepth = 3;
 
   // whether to cheat and use the list of next tiles
   // not yet implemented
