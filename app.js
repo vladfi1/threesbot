@@ -39,7 +39,7 @@ var MoveEvaluator = function() {
     case 2: return array[i-1] === 1;
     default: return array[i-1] === array[i];
     }
-  }
+  };
 
   var canPushArray = function(array) {
     for (var i = array.length; --i > 0;) {
@@ -89,7 +89,7 @@ var MoveEvaluator = function() {
     }
     
     if (direction in dirReverses) {
-      disassembled = disassembled.map(function(arr) { return arr.reverse() });
+      disassembled = disassembled.map(function(arr) { return arr.reverse(); });
     }
     
     return disassembled;
@@ -99,7 +99,7 @@ var MoveEvaluator = function() {
     var assembled = $.extend(true, [], grid);
     
     if (direction in dirReverses) {
-      assembled = assembled.map(function(arr) { return arr.reverse() });
+      assembled = assembled.map(function(arr) { return arr.reverse(); });
     }
     
     if (direction in dirTransposes) {
@@ -226,6 +226,9 @@ var Controller = function() {
   // move delay, in ms
   var moveDelay = 200;
 
+  // whether to run choppily/quickly or smoothly
+  var choppy = false;
+
   // search depth
   var searchDepth = 2;
 
@@ -262,14 +265,13 @@ var Controller = function() {
     var canMove = moveEvaluator.canApplyMove(gameState.board, nextMove);
     // console.log(nextMove + " : canApplyMove = " + canMove);
 
-    // in order to check we can't move in any direction
-    var canMoveDirs = 4;
-
-    if(canMove === false) {
+    if(!canMove) {
+      // in order to check we can't move in any direction
+      var canMoveDirs = 4;
       console.log(stringifyBoard(gameState.board));
       for(var i=0; i<4; i++) {
         var canMoveThisDir = moveEvaluator.canApplyMove(gameState.board, moveEvaluator.dirs[i]);
-        if(canMoveThisDir === false) {
+        if(!canMoveThisDir) {
           canMoveDirs--;
         }
         console.log(moveEvaluator.dirs[i] + " : " + canMoveThisDir);
@@ -282,7 +284,10 @@ var Controller = function() {
     }
 
     inputMove(nextMove);
-    that.redrawBoard();
+
+    if(choppy) {
+      that.redrawBoard();
+    }
 
     return nextMove;
   };
@@ -290,11 +295,22 @@ var Controller = function() {
   that.play = function() {
     $("#playButton").attr("value", "Stop").click(controller.stop);
     if(playInterval === null) {
-      playInterval = setInterval(that.move, moveDelay);
+      if(choppy) { 
+        console.log("playing choppy");
+        playInterval = setInterval(that.move, moveDelay);
+      } else {
+        playInterval = setInterval(function() {
+          console.log("playing smooth");
+          if(!$(".board>.tile").is(":animated")) {
+            that.move();
+          }
+        }, moveDelay);
+      }
     }
   };
 
   that.stop = function() {
+    moveCounter = 0;
     that.redrawBoard();
 
     $("#playButton").attr("value", "Play").click(controller.play);
@@ -303,6 +319,12 @@ var Controller = function() {
       playInterval = null;
     }
   };
+
+  that.setChoppy = function(newChoppy) {
+    that.stop();
+    choppy = newChoppy;
+  };
+
 
   return that;
 };

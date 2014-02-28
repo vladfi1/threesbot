@@ -23,7 +23,7 @@ var MoveEvaluator = function() {
     case 2: return array[i-1] === 1;
     default: return array[i-1] === array[i];
     }
-  }
+  };
 
   var canPushArray = function(array) {
     for (var i = array.length; --i > 0;) {
@@ -73,7 +73,7 @@ var MoveEvaluator = function() {
     }
     
     if (direction in dirReverses) {
-      disassembled = disassembled.map(function(arr) { return arr.reverse() });
+      disassembled = disassembled.map(function(arr) { return arr.reverse(); });
     }
     
     return disassembled;
@@ -83,7 +83,7 @@ var MoveEvaluator = function() {
     var assembled = $.extend(true, [], grid);
     
     if (direction in dirReverses) {
-      assembled = assembled.map(function(arr) { return arr.reverse() });
+      assembled = assembled.map(function(arr) { return arr.reverse(); });
     }
     
     if (direction in dirTransposes) {
