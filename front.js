@@ -59,7 +59,8 @@ var Controller = function() {
     var gameState = readGameState();
     var nextMove = moveEvaluator.evaluateMove(searchDepth, gameState.board, gameState.nextTile)[0];
     var canMove = moveEvaluator.canApplyMove(gameState.board, nextMove);
-    // console.log(nextMove + " : canApplyMove = " + canMove);
+    //console.log(nextMove + " : canApplyMove = " + canMove);
+    //console.log(stringifyBoard(gameState.board));
 
     if(!canMove) {
       // in order to check we can't move in any direction
