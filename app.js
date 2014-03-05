@@ -142,8 +142,8 @@ var MoveEvaluator = function() {
   
   var scoreTile = function(tile) {
     switch (tile) {
-    case -1: case 0: return 0;
-    case 1: case 2: return -100;
+    // case -1: case 0: return 0;
+    case 1: case 2: return -1000;
     default: return tile * tile;
     }
   };
@@ -213,7 +213,10 @@ var MoveEvaluator = function() {
       var prev = count[0];
       count[0] = 0;
       bestDir = evaluateMove(searchDepth, count, grid, next)[0];
-      if (count[0] === prev) break;
+      if (count[0] === prev) {
+        console.log("Dead end :(");
+        break;
+      }
     }
     
     console.log(searchDepth);
