@@ -142,6 +142,9 @@ var MoveEvaluator = function() {
     return score;
   };
   
+  // possible next tiles
+  var tiles = [-1, 1, 2];
+  
   // takes the avg over where the next tile goes
   var evaluatePartial = function(depth, count, partialGrid, next) {
     var grid = partialGrid[0];
@@ -158,11 +161,13 @@ var MoveEvaluator = function() {
     
     for (var i = free.length; --i >= 0;) {
       grid[free[i]][0] = next;
-      avg += evaluateMove(depth, count, grid, -1)[1];
+      for (var j = tiles.length; --j >= 0;) {
+        avg += evaluateMove(depth, count, grid, tiles[j])[1];
+      }
       grid[free[i]][0] = 0;
     }
     
-    return avg / free.length;
+    return avg / (free.length * tiles.length);
   };
 
   // gets the best move given the next tile
