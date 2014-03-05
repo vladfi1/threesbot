@@ -127,7 +127,7 @@ var MoveEvaluator = function() {
   var scoreTile = function(tile) {
     switch (tile) {
     case -1: case 0: return 0;
-    case 1: case 2: return -10;
+    case 1: case 2: return -100;
     default: return tile * tile;
     }
   };
@@ -142,12 +142,15 @@ var MoveEvaluator = function() {
     return score;
   };
   
-  // takes the avg over where the next particle goes
-  var evaluatePartial = function(depth, partialGrid, next) {
+  // takes the avg over where the next tile goes
+  var evaluatePartial = function(depth, count, partialGrid, next) {
     var grid = partialGrid[0];
     var free = partialGrid[1];
     
     if (free.length === 0) return -100000;
+    
+    ++count[0];
+
     if (depth === 0) return scoreBoard(grid);
     --depth;
     
@@ -155,7 +158,7 @@ var MoveEvaluator = function() {
     
     for (var i = free.length; --i >= 0;) {
       grid[free[i]][0] = next;
-      avg += that.evaluateMove(depth, grid, -1)[1];
+      avg += evaluateMove(depth, count, grid, -1)[1];
       grid[free[i]][0] = 0;
     }
     
@@ -163,13 +166,14 @@ var MoveEvaluator = function() {
   };
 
   // gets the best move given the next tile
-  that.evaluateMove = function(depth, grid, next) {
+  var evaluateMove = function(depth, count, grid, next) {
+    ++count[0];
     var partialGrids = partialApplyMoves(grid);
 
     // console.log('evaluateMove: depth = ' + depth);
     
     var scores = partialGrids.map(function(partialGrid) {
-      return 1 + evaluatePartial(depth, partialGrid, next);
+      return 1 + evaluatePartial(depth, count, partialGrid, next);
     });
     
     var maxIndex = argmax(scores);
@@ -177,6 +181,23 @@ var MoveEvaluator = function() {
     // console.log(scores.toString());
     
     return [dirs[maxIndex], scores[maxIndex]];
+  };
+  
+  that.bestMove = function(grid, next) {
+    var searchDepth = 0;
+    var count = [0];
+    var bestDir;
+    while (count[0] < 10000) {
+      ++searchDepth;
+      var prev = count[0];
+      count[0] = 0;
+      bestDir = evaluateMove(searchDepth, count, grid, next)[0];
+      if (count[0] === prev) break;
+    }
+    
+    console.log(searchDepth);
+    
+    return bestDir;
   };
   
   return that;

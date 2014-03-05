@@ -25,9 +25,6 @@ var Controller = function() {
   // whether to run choppily/quickly or smoothly
   var choppy = false;
 
-  // search depth
-  var searchDepth = 3;
-
   // whether to cheat and use the list of next tiles
   // not yet implemented
   that.useNextTileList = false;
@@ -57,7 +54,7 @@ var Controller = function() {
     moveCounter++;
 
     var gameState = readGameState();
-    var nextMove = moveEvaluator.evaluateMove(searchDepth, gameState.board, gameState.nextTile)[0];
+    var nextMove = moveEvaluator.bestMove(gameState.board, gameState.nextTile);
     var canMove = moveEvaluator.canApplyMove(gameState.board, nextMove);
     //console.log(nextMove + " : canApplyMove = " + canMove);
     //console.log(stringifyBoard(gameState.board));
