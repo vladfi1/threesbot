@@ -152,7 +152,7 @@ var MoveEvaluator = function() {
     var score = 0;
     for (var row = grid.length; --row >= 0;) {
       for (var col = grid[row].length; --col >= 0;) {
-        score += scoreTile(grid[row][col]);
+        score -= scoreTile(grid[row][col]);
       }
     }
     return score;
