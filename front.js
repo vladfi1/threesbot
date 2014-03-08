@@ -90,11 +90,11 @@ var Controller = function() {
     $("#playButton").attr("value", "Stop").click(controller.stop);
     if(playInterval === null) {
       if(choppy) { 
-        console.log("playing choppy");
+        //console.log("playing choppy");
         playInterval = setInterval(that.move, moveDelay);
       } else {
         playInterval = setInterval(function() {
-          console.log("playing smooth");
+          //console.log("playing smooth");
           if(!$(".board>.tile").is(":animated")) {
             that.move();
           }
