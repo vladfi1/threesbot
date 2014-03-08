@@ -132,13 +132,47 @@ var MoveEvaluator = function() {
     }
   };
   
+  var scorePair = function(tile1, tile2) {
+    var small, large;
+    
+    if (tile1 <= tile2) {
+      small = tile1;
+      large = tile2;
+    } else {
+      small = tile2;
+      large = tile1;
+    }
+    
+    switch(small) {
+    //case -1: case 0: return 0;
+    case 1:
+      if (large === 1) return -100;
+      else if (large === 2) return 0;
+      else return -large;
+    case 2:
+      if (large === 2) return -100;
+      else if (large === 1) return 0;
+      else return -large;
+    default:
+      return small - large;
+    }
+  };
+  
   var scoreBoard = function(grid) {
     var score = 0;
-    for (var row = grid.length; --row >= 0;) {
-      for (var col = grid[row].length; --col >= 0;) {
+    for (var row = gridSize; --row >= 0;) {
+      for (var col = gridSize; --col >= 0;) {
         score += scoreTile(grid[row][col]);
       }
     }
+    
+    for (var i = gridSize; --i > 0;) {
+      for (var j = gridSize; --j >= 0;) {
+        score += scorePair(grid[i-1][j], grid[i][j]);
+        score += scorePair(grid[j][i-1], grid[j][i]);
+      }
+    }
+
     return score;
   };
   
