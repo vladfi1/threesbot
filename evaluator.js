@@ -175,9 +175,7 @@ var MoveEvaluator = function() {
 
     return score;
   };
-  
-  // possible next tiles
-  var tiles = [-1, 1, 2];
+
   
   // takes the avg over where the next tile goes
   var evaluatePartial = function(depth, count, partialGrid, next) {
@@ -188,8 +186,11 @@ var MoveEvaluator = function() {
     
     ++count[0];
 
-    if (depth === 0) return scoreBoard(grid);
-    --depth;
+    if (depth === searchDepth) return scoreBoard(grid);
+    ++depth;
+    
+    // possible next tiles
+    var tiles = depth > 0 ? [-1] : [-1, 1, 2];
     
     var avg = 0;
     
@@ -222,15 +223,17 @@ var MoveEvaluator = function() {
     return [dirs[maxIndex], scores[maxIndex]];
   };
   
+  var searchDepth;
+  
   that.bestMove = function(grid, next) {
-    var searchDepth = 0;
+    searchDepth = 0;
     var count = [0];
     var bestDir;
     while (count[0] < 10000) {
       ++searchDepth;
       var prev = count[0];
       count[0] = 0;
-      bestDir = evaluateMove(searchDepth, count, grid, next)[0];
+      bestDir = evaluateMove(0, count, grid, next)[0];
       if (count[0] === prev) {
         console.log("Dead end :(");
         break;
