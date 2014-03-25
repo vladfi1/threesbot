@@ -22,3 +22,9 @@ Minifying app.js uses uglifyjs, which can be installed in Debian/Ubuntu via
 or in Fedora via
 
     yum install uglify-js
+
+For your convenience, you can run
+
+    ./buildApp.sh
+
+to both make the minified script and copy it straight to your clipboard.
