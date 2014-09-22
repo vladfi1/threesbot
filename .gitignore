@@ -1,3 +1,9 @@
 *~
 *.swp
 threes/
+
+game.js
+utils.js
+mcts.js
+lib.coffee
+lib.js
