@@ -58,8 +58,21 @@ move = (grid, dir) ->
   
   return [transformed, free]
 
+gridWidth = 4
+gridHeight = 4
+gridSize = gridWidth * gridHeight
+
+class ThreesState extends GameState
+  constructor: (@grid) ->
+  
+  numEmpty: ->
+    sum(count(0, row) for row in @grid)
+  
+  evaluate: ->
+    numEmpty() / gridSize
+
 class ThreesState0 extends GameState
-  constructor: (@grid, @next = null) ->
+  constructor: (@grid, @next) ->
 
   agent: 0
   isRandom: false
@@ -71,7 +84,7 @@ class ThreesState0 extends GameState
   
   nextStates: ->
     ([dir, @move(dir)] for dir in dirs)
-  
+    
 
 class ThreesState1 extends GameState
   constructor: (@grid, @free, @next) ->
@@ -95,13 +108,25 @@ class ThreesState2 extends GameState
   spawn: (val) ->
     grid = @grid[..]
     row = grid[index][..]
-    row[0] = val
+    row[0] = @next
     grid[index] = row
-    new ThreesState0(grid, null)
+    new ThreesState0(grid, val)
   
   nextStates: ->
-    vals = if @next == null then [1, 2, 3] else @next
+    vals = [1, 2, 3]
     weight = 1 / vals.length
     [[weight, spawn(val)] for val in vals]
 
+heuristic = (state) -> rollOutEval(5, state)
+strategy = new Strategy(heuristic, uct)
 
+bestMove = (grid, next) ->
+  initial = ThreesState1(grid, next)
+  node = strategy.initNode(initial)
+  think = () -> strategy.explore(node)
+  doFor(1000, think)
+  return bestAction(node)
+
+# export bestMove
+window.game = {}
+window.game.bestMove = bestMove

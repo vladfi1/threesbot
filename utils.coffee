@@ -1,8 +1,8 @@
 sum = (xs) ->
-  _.reduce(xs, (a, b) -> a + b)
+  _.reduce(xs, ((a, b) -> a + b), 0)
 
 zipWith = (f, lists...) ->
-  _.map(f, _.zip(lists))
+  _.map(f, _.zip(lists...))
 
 sample = (weights) ->
   random = Math.random()
@@ -12,3 +12,14 @@ sample = (weights) ->
     total += w
     if random <= total
       return i
+
+count = (x, xs) ->
+  _.reduce(xs, ((total, y) -> if y == x then total+1 else total), 0)
+
+currentTime = () ->
+  new Date().getTime()
+
+doFor = (t, f) ->
+  start = currentTime()
+  while currentTime() - start < t
+    f()
