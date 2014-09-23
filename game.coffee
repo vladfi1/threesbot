@@ -59,7 +59,7 @@ move = (grid, dir) ->
   return [transformed, free]
 
 class ThreesState extends GameState
-  constructor: (@grid) ->
+  constructor: (@grid, @depth=0) ->
   
   gridSize: ->
     sum(row.length for row in @grid)
@@ -68,10 +68,12 @@ class ThreesState extends GameState
     sum(count(0, row) for row in @grid)
   
   evaluate: ->
-    [@numEmpty() / @gridSize()]
+    empty = (@numEmpty() + @depth) / @gridSize()
+    depth = @depth / (@depth + 5)
+    return [empty + depth]
 
 class ThreesState0 extends ThreesState
-  constructor: (@grid, @next) ->
+  constructor: (@grid, @next, @depth=0) ->
     nextStates = ([dir, @move(dir)] for dir in dirs)
     nextStates = (s for s in nextStates when s[1] isnt null)
     @nextStates = () -> nextStates
@@ -84,24 +86,23 @@ class ThreesState0 extends ThreesState
     [transformed, free] = move(@grid, dir)
     if free.length == 0
       return null
-    return new ThreesState1(transformed, free, @next)
+    return new ThreesState1(transformed, free, @next, @depth)
     
-
 class ThreesState1 extends ThreesState
-  constructor: (@grid, @free, @next) ->
+  constructor: (@grid, @free, @next, @depth) ->
   
   isRandom: true
   terminal: false
   
   spawn: (index) ->
-    new ThreesState2(@grid, index, @next)
+    new ThreesState2(@grid, index, @next, @depth)
   
   nextStates: ->
     weight = 1.0 / @free.length
     ([weight, @spawn(index)] for index in @free)
   
 class ThreesState2 extends ThreesState
-  constructor: (@grid, @index, @next) ->
+  constructor: (@grid, @index, @next, @depth) ->
 
   isRandom: true
   terminal: false
@@ -111,7 +112,7 @@ class ThreesState2 extends ThreesState
     row = grid[@index][..]
     row[0] = @next
     grid[@index] = row
-    new ThreesState0(grid, val)
+    new ThreesState0(grid, val, @depth+1)
   
   nextStates: ->
     vals = [1, 2, 3]
@@ -126,7 +127,7 @@ bestMove = (grid, next) ->
   initial = new ThreesState0(grid, next)
   node = strategy.initNode(initial)
   think = () -> strategy.explore(node)
-  doFor(500, think)
+  doFor(1000, think)
   return bestAction(node)
 
 # export bestMove

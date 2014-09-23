@@ -327,8 +327,9 @@
   ThreesState = (function(_super) {
     __extends(ThreesState, _super);
 
-    function ThreesState(grid) {
+    function ThreesState(grid, depth) {
       this.grid = grid;
+      this.depth = depth != null ? depth : 0;
     }
 
     ThreesState.prototype.gridSize = function() {
@@ -360,7 +361,10 @@
     };
 
     ThreesState.prototype.evaluate = function() {
-      return [this.numEmpty() / this.gridSize()];
+      var depth, empty;
+      empty = this.numEmpty() / this.gridSize();
+      depth = this.depth / (this.depth + 5);
+      return [empty + depth];
     };
 
     return ThreesState;
@@ -370,10 +374,11 @@
   ThreesState0 = (function(_super) {
     __extends(ThreesState0, _super);
 
-    function ThreesState0(grid, next) {
+    function ThreesState0(grid, next, depth) {
       var dir, nextStates, s;
       this.grid = grid;
       this.next = next;
+      this.depth = depth != null ? depth : 0;
       nextStates = (function() {
         var _i, _len, _results;
         _results = [];
@@ -410,7 +415,7 @@
       if (free.length === 0) {
         return null;
       }
-      return new ThreesState1(transformed, free, this.next);
+      return new ThreesState1(transformed, free, this.next, this.depth);
     };
 
     return ThreesState0;
@@ -420,10 +425,11 @@
   ThreesState1 = (function(_super) {
     __extends(ThreesState1, _super);
 
-    function ThreesState1(grid, free, next) {
+    function ThreesState1(grid, free, next, depth) {
       this.grid = grid;
       this.free = free;
       this.next = next;
+      this.depth = depth;
     }
 
     ThreesState1.prototype.isRandom = true;
@@ -431,7 +437,7 @@
     ThreesState1.prototype.terminal = false;
 
     ThreesState1.prototype.spawn = function(index) {
-      return new ThreesState2(this.grid, index, this.next);
+      return new ThreesState2(this.grid, index, this.next, this.depth);
     };
 
     ThreesState1.prototype.nextStates = function() {
@@ -453,10 +459,11 @@
   ThreesState2 = (function(_super) {
     __extends(ThreesState2, _super);
 
-    function ThreesState2(grid, index, next) {
+    function ThreesState2(grid, index, next, depth) {
       this.grid = grid;
       this.index = index;
       this.next = next;
+      this.depth = depth;
     }
 
     ThreesState2.prototype.isRandom = true;
@@ -469,7 +476,7 @@
       row = grid[this.index].slice(0);
       row[0] = this.next;
       grid[this.index] = row;
-      return new ThreesState0(grid, val);
+      return new ThreesState0(grid, val, this.depth + 1);
     };
 
     ThreesState2.prototype.nextStates = function() {
@@ -501,7 +508,7 @@
     think = function() {
       return strategy.explore(node);
     };
-    doFor(500, think);
+    doFor(1000, think);
     return bestAction(node);
   };
 
