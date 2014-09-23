@@ -4,7 +4,7 @@ class GameState
   terminal: true
   nextStates: -> []
 
-canPushArrayIndex = (array, index) ->
+canPushArrayIndex = (array, i) ->
   switch array[i]
     when -1 then false
     when  0 then array[i-1] != 0
@@ -58,48 +58,49 @@ move = (grid, dir) ->
   
   return [transformed, free]
 
-gridWidth = 4
-gridHeight = 4
-gridSize = gridWidth * gridHeight
-
 class ThreesState extends GameState
   constructor: (@grid) ->
+  
+  gridSize: ->
+    sum(row.length for row in @grid)
   
   numEmpty: ->
     sum(count(0, row) for row in @grid)
   
   evaluate: ->
-    numEmpty() / gridSize
+    [@numEmpty() / @gridSize()]
 
-class ThreesState0 extends GameState
+class ThreesState0 extends ThreesState
   constructor: (@grid, @next) ->
-
+    nextStates = ([dir, @move(dir)] for dir in dirs)
+    nextStates = (s for s in nextStates when s[1] isnt null)
+    @nextStates = () -> nextStates
+    @terminal = nextStates.length == 0
+  
   agent: 0
   isRandom: false
-  terminal: false
   
   move: (dir) ->
     [transformed, free] = move(@grid, dir)
+    if free.length == 0
+      return null
     return new ThreesState1(transformed, free, @next)
-  
-  nextStates: ->
-    ([dir, @move(dir)] for dir in dirs)
     
 
-class ThreesState1 extends GameState
+class ThreesState1 extends ThreesState
   constructor: (@grid, @free, @next) ->
-    @terminal = @free.length == 0
   
   isRandom: true
+  terminal: false
   
   spawn: (index) ->
     new ThreesState2(@grid, index, @next)
   
   nextStates: ->
     weight = 1.0 / @free.length
-    [[weight, spawn(index)] for index in @free]
+    ([weight, @spawn(index)] for index in @free)
   
-class ThreesState2 extends GameState
+class ThreesState2 extends ThreesState
   constructor: (@grid, @index, @next) ->
 
   isRandom: true
@@ -107,26 +108,27 @@ class ThreesState2 extends GameState
   
   spawn: (val) ->
     grid = @grid[..]
-    row = grid[index][..]
+    row = grid[@index][..]
     row[0] = @next
-    grid[index] = row
+    grid[@index] = row
     new ThreesState0(grid, val)
   
   nextStates: ->
     vals = [1, 2, 3]
     weight = 1 / vals.length
-    [[weight, spawn(val)] for val in vals]
+    ([weight, @spawn(val)] for val in vals)
 
-heuristic = (state) -> rollOutEval(5, state)
+heuristic = (state) ->
+  rollOutEval(5, state)
 strategy = new Strategy(heuristic, uct)
 
 bestMove = (grid, next) ->
-  initial = ThreesState1(grid, next)
+  initial = new ThreesState0(grid, next)
   node = strategy.initNode(initial)
   think = () -> strategy.explore(node)
-  doFor(1000, think)
+  doFor(500, think)
   return bestAction(node)
 
 # export bestMove
-window.game = {}
-window.game.bestMove = bestMove
+window.threesbot = {}
+window.threesbot.bestMove = bestMove

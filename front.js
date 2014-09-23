@@ -55,7 +55,7 @@ var Controller = function() {
 
     var gameState = readGameState();
     //var nextMove = moveEvaluator.bestMove(gameState.board, gameState.nextTile);
-    var nextMove = game.bestMove(gameState.board, gameState.nextTile);
+    var nextMove = threesbot.bestMove(gameState.board, gameState.nextTile);
     var canMove = moveEvaluator.canApplyMove(gameState.board, nextMove);
     //console.log(nextMove + " : canApplyMove = " + canMove);
     //console.log(stringifyBoard(gameState.board));

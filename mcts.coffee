@@ -5,23 +5,25 @@ class Value
     @wins[agent] / @visits
 
 addValues = (values...) ->
-  new Value(zipWith(sum, (v.wins for v in values)...), sum(v.visits for v in values))
+  new Value(zipWith(sum, (v1.wins for v1 in values)...), sum(v2.visits for v2 in values))
 
 class Strategy
   constructor: (@heuristic, @pick) ->
   
   initNode: (state) ->
-    state:    state
-    value:    @heuristic(state)
-    children: null
-
+    return {
+      state:    state
+      value:    @heuristic(state)
+      children: null
+    }
+  
   initChildren: (node) ->
     nextStates = node.state.nextStates()
     if node.state.isRandom
-      [node.weights, states] = _.zip(nextStates)
+      [node.weights, states] = _.zip(nextStates...)
     else
-      [node.actions, states] = _.zip(nextStates)
-    node.children = _.map(@initNode, states)
+      [node.actions, states] = _.zip(nextStates...)
+    node.children = (@initNode(state) for state in states)
   
   explore: (node) ->
     state = node.state
@@ -30,19 +32,25 @@ class Strategy
       value = @heuristic(state)
     else if node.children is null
       @initChildren(node)
-      value = addValues(child.value for child in node.children)
+      values = (child.value for child in node.children)
+      value = addValues((child.value for child in node.children)...)
     else
-      index = if state.isRandom then sample(node.weights) else @pick(node)
-      value = explore(node.children[index])
+      if state.isRandom
+        index = sample(node.weights)
+      else
+        index = @pick(node)
+      value = @explore(node.children[index])
     
     node.value = addValues(node.value, value)
     return value
 
 rollOutEval = (depth, state) ->
+  #console.log("Depth: " + depth)
+  
   if state.terminal or depth == 0
     return new Value(state.evaluate())
   
-  [weights, states] = _zip(state.nextStates())
+  [weights, states] = _.zip(state.nextStates()...)
   if state.isRandom
     return rollOutEval(depth-1, states[sample(weights)])
   else

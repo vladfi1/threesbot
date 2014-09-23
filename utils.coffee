@@ -2,7 +2,7 @@ sum = (xs) ->
   _.reduce(xs, ((a, b) -> a + b), 0)
 
 zipWith = (f, lists...) ->
-  _.map(f, _.zip(lists...))
+  _.map(_.zip(lists...), f)
 
 sample = (weights) ->
   random = Math.random()

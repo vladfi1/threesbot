@@ -1,2 +1,2 @@
 #!/bin/sh
-xclip -sel clip < app.min.js
+xclip -sel clip < app.js
